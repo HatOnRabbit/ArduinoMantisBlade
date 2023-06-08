@@ -1,0 +1,55 @@
+#include <Servo.h>
+
+const int buttonPin = 2;     // the number of the pushbutton pin
+const int ledPin =  13;      // the number of the LED pin
+
+// variables will change:
+int buttonState = 0;         // variable for reading the pushbutton status
+boolean canChange = true;
+boolean isRetracted = false;
+
+#define baseServoPin 7
+Servo baseServo; //For the one directly on the arm
+
+#define bladeServoPin 9
+Servo bladeServo; //For the blade
+
+void setup() {
+  baseServo.attach(baseServoPin);
+  bladeServo.attach(bladeServoPin);
+  Serial.print("State: ");
+  if(isRetracted == false){
+      Serial.println("Retracted");
+    }else{
+      Serial.println("Exposed");
+    }
+  Serial.begin(9600);
+   bladeServo.write(20);
+  baseServo.write(70);
+}
+
+void loop() {
+  // read the state of the pushbutton value:
+  buttonState = digitalRead(buttonPin);
+  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+  if(canChange && buttonState){
+    isRetracted = !isRetracted;
+    canChange = false;
+    Serial.print("State: ");
+  if(isRetracted == false){
+      Serial.println("Retracted");
+    }else{
+      Serial.println("Exposed");
+    }
+  }
+  if(isRetracted == false){
+      bladeServo.write(20);
+      baseServo.write(70);
+    }else{
+      bladeServo.write(80);
+      baseServo.write(00);
+    }
+  if(buttonState == 0){
+    canChange = true;
+  }
+}
